@@ -10,21 +10,16 @@
     "sqlite"
   ],
   "author": {
-    "name": "Jared Hanson",
-    "email": "jaredhanson@gmail.com",
-    "url": "https://www.jaredhanson.me/"
+    "name": "Nagy Peter",
+    "email": "nagypeterpal@gmail.com"
   },
-  "homepage": "https://github.com/passport/todos-express-google",
+  "homepage": "https://github.com/nagypeterpal/mapus",
   "repository": {
     "type": "git",
-    "url": "git://github.com/passport/todos-express-google.git"
+    "url": "https://github.com/nagypeterpal/mapus.git"
   },
   "bugs": {
-    "url": "https://github.com/passport/todos-express-google/issues"
-  },
-  "funding": {
-    "type": "github",
-    "url": "https://github.com/sponsors/jaredhanson"
+    "url": "https://github.com/nagypeterpal/mapus/issues"
   },
   "license": "Unlicense",
   "scripts": {

@@ -32,7 +32,7 @@ db.serialize(function () {
     user_id INTEGER NOT NULL, \
     timestamp TEXT NOT NULL, \
     lat TEXT NOT NULL, \
-    lang TEXT NOT NULL \
+    long TEXT NOT NULL \
   )"
   );
 });

@@ -1,8 +1,8 @@
 {
-  "name": "todos-express-google",
+  "name": "mapus",
   "version": "0.0.0",
   "private": true,
-  "description": "Todo app using Express and Passport for sign in with Google.",
+  "description": "Mapping us to see each other",
   "keywords": [
     "example",
     "express",

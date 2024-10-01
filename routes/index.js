@@ -42,14 +42,34 @@ router.get(
     }
     next();
   },
-  fetchTodos,
+  /*fetchTodos,*/
   function (req, res, next) {
     res.locals.filter = null;
     console.log(req.user);
-    res.render("index", { user: req.user });
+    res.render("index", { user: req.user, csrfToken: req.csrfToken() });
   }
 );
 
+router.post(
+  "/getLocations",
+  ensureLoggedIn,
+  /*fetchTodos, */
+  function (req, res) {
+    var timestamp = new Date();
+    console.log(timestamp);
+    db.run(
+      "INSERT INTO locations (user_id, timestamp, lat,long) VALUES (?, ?, ?, ?)",
+      [req.user.id, timestamp.toJSON(), req.body.lat, req.body.long],
+      function (err) {
+        if (err) {
+          console.log(err);
+        }
+      }
+    );
+  }
+);
+
+/*
 router.get("/active", ensureLoggedIn, fetchTodos, function (req, res, next) {
   res.locals.todos = res.locals.todos.filter(function (todo) {
     return !todo.completed;
@@ -65,33 +85,6 @@ router.get("/completed", ensureLoggedIn, fetchTodos, function (req, res, next) {
   res.locals.filter = "completed";
   res.render("index", { user: req.user });
 });
-
-router.post(
-  "/",
-  ensureLoggedIn,
-  function (req, res, next) {
-    req.body.title = req.body.title.trim();
-    next();
-  },
-  function (req, res, next) {
-    if (req.body.title !== "") {
-      return next();
-    }
-    return res.redirect("/" + (req.body.filter || ""));
-  },
-  function (req, res, next) {
-    db.run(
-      "INSERT INTO todos (owner_id, title, completed) VALUES (?, ?, ?)",
-      [req.user.id, req.body.title, req.body.completed == true ? 1 : null],
-      function (err) {
-        if (err) {
-          return next(err);
-        }
-        return res.redirect("/" + (req.body.filter || ""));
-      }
-    );
-  }
-);
 
 router.post(
   "/:id(\\d+)",
@@ -172,5 +165,6 @@ router.post("/clear-completed", ensureLoggedIn, function (req, res, next) {
     }
   );
 });
+*/
 
 module.exports = router;

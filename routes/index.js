@@ -54,15 +54,47 @@ router.post(
   ensureLoggedIn,
   /*fetchTodos, */
   function (req, res) {
-    var timestamp = new Date();
-    console.log(timestamp);
     db.run(
-      "INSERT INTO locations (user_id, timestamp, lat,long) VALUES (?, ?, ?, ?)",
-      [req.user.id, timestamp.toJSON(), req.body.lat, req.body.long],
+      "INSERT INTO locations (user_id, timestamp, lat,long) VALUES (?, datetime(), ?, ?)",
+      [req.user.id, req.body.lat, req.body.long],
       function (err) {
         if (err) {
           console.log(err);
         }
+      }
+    );
+
+    db.all(
+      "SELECT users.name,locations.lat,locations.long FROM locations,users WHERE users.id=locations.user_id AND " +
+        "  (locations.user_id, locations.timestamp) IN ( SELECT user_id, MAX(timestamp) FROM locations  WHERE timestamp > datetime('now','-1 hour') GROUP BY user_id)",
+      function (err, rows) {
+        if (err) {
+          res.json({
+            msg: "error",
+          });
+        } else {
+          var userLocations = rows.map(function (row) {
+            return {
+              name: row.name,
+              lat: row.lat,
+              long: row.long,
+            };
+          });
+
+          res.json({
+            msg: "success",
+            locations: userLocations,
+          });
+        }
+
+        /*
+        res.locals.todos = todos;
+        res.locals.activeCount = todos.filter(function (todo) {
+          return !todo.completed;
+        }).length;
+        res.locals.completedCount = todos.length - res.locals.activeCount;
+        next();
+        */
       }
     );
   }

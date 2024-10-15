@@ -1,5 +1,7 @@
+//config
 var map;
-/*cr_nagypeter_l2_HxkGX426Sc0YATUAHOxE0QSE*/
+var lg;
+
 $.ajaxSetup({
   beforeSend: function (xhr) {
     xhr.setRequestHeader(
@@ -9,69 +11,58 @@ $.ajaxSetup({
   },
 });
 
+//when document ready
 $(document).ready(function () {
-  //init map
-  initMap();
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by this browser.");
+  } else {
+    //init map
+    navigator.geolocation.getCurrentPosition(initMap);
 
-  //staritn main llop
-  var tid = setInterval(mainloop, 5000);
+    //starting main loop
+    var tid = setInterval(mainloop, 5000);
+  }
 });
 
-function initMap() {
-  map = L.map("map").setView([51.505, -0.09], 13);
+//the init function
+function initMap(position) {
+  const coord_lat = position.coords.latitude;
+  const coord_long = position.coords.longitude;
+
+  map = L.map("map").setView([coord_lat, coord_long], 13);
+  lg = L.layerGroup().addTo(map);
+
   const tiles = L.tileLayer(
     "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
     {}
   ).addTo(map);
-
-  function onMapClick(e) {
-    const popup = L.popup()
-      .setLatLng(e.latlng)
-      .setContent(`You clicked the map at ${e.latlng.toString()}`)
-      .openOn(map);
-  }
-
-  map.on("click", onMapClick);
 }
 
 function mainloop() {
-  /*logging your location*/
-
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(handlePosition);
-  } else {
-    alert("Geolocation is not supported by this browser.");
-  }
+  navigator.geolocation.getCurrentPosition(handlePosition);
 }
 
 /*putting your marker on the screen*/
 function handlePosition(position) {
+  //adjust the map to our position
   const coord_lat = position.coords.latitude;
   const coord_long = position.coords.longitude;
+
+  //clear all markers
+  lg.clearLayers();
 
   /* getting server data of all users */
   $.ajax({
     url: "/getLocations",
     type: "POST",
     data: { lat: coord_lat, long: coord_long },
-    dataType: "text",
-    success: function (response, status, http) {
-      console.log("AJAX worked!: ");
+    dataType: "json",
+    success: function (result, status, http) {
+      $.each(result.locations, function (key, value) {
+        L.tooltip([value.lat, value.long], {
+          content: "<p>" + value.name + "</p>",
+        }).openOn(lg);
+      });
     },
   });
-
-  console.log(
-    "mycoordinates datetime: " +
-      Date.now() +
-      " lat:" +
-      coord_lat +
-      " long: " +
-      coord_long
-  );
-
-  /*putting your marker on the screen*/
-  const marker = L.marker([coord_lat, coord_long])
-    .addTo(map)
-    .bindPopup("I am here")
-    .openPopup();
 }
